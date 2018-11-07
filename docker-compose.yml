@@ -29,9 +29,35 @@ services:
       - /var/log/nginx/:/var/log/nginx/:rw
     restart: always
     networks:
+      - net-php
       - net-php72
       - net-php56
       - net-php54
+
+  php:
+    build:
+      context: .
+      args:
+        PHP_VERSION: 7.2
+        SOURCE_LIST: stretch
+        XDEBUG_VERSION: 2.6.1
+        SWOOLE_VERSION: 4.2.1
+        SUPPORT_MCRYPT: "false"
+        BUILT_IN_OPCACHE: "true"
+    expose:
+      - "9000"
+    volumes:
+      - /Users/chunguanghao/Documents/ofashion/projects/:/Users/chunguanghao/Documents/ofashion/projects/:rw
+      - ./conf/php.ini:/usr/local/etc/php/php.ini:ro
+      - ./conf/php-fpm.conf:/usr/local/etc/php-fpm.d/www.conf:rw
+      - ./log/:/var/log/dnmp/:rw
+    restart: always
+    cap_add:
+      - SYS_PTRACE
+    networks:
+      - net-php
+      - net-mysql
+      - net-redis
 
   php72:
     build:
@@ -71,7 +97,7 @@ services:
     expose:
       - "9000"
     volumes:
-      - ./www/:/var/www/html/:rw
+      - /Users/chunguanghao/Documents/ofashion/projects/:/Users/chunguanghao/Documents/ofashion/projects/:rw
       - ./conf/php.ini:/usr/local/etc/php/php.ini:ro
       - ./conf/php-fpm.conf:/usr/local/etc/php-fpm.d/www.conf:rw
       - ./log/:/var/log/dnmp/:rw
@@ -96,7 +122,7 @@ services:
     expose:
       - "9000"
     volumes:
-      - ./www/:/var/www/html/:rw
+      - /Users/chunguanghao/Documents/ofashion/projects/:/Users/chunguanghao/Documents/ofashion/projects/:rw
       - ./conf/php.ini:/usr/local/etc/php/php.ini:ro
       - ./conf/php-fpm.conf:/usr/local/etc/php-fpm.d/www.conf:rw
       - ./log/:/var/log/dnmp/:rw
@@ -150,6 +176,7 @@ services:
       - REDIS_1_PORT=6379
 
 networks:
+  net-php:
   net-php72:
   net-php56:
   net-php54:

@@ -50,7 +50,7 @@ services:
   php:
     build:
       context: .
-      dockerfile: xhprof/Dockerfile
+      dockerfile: xhprof/5/Dockerfile
       args:
         PHP_VERSION: 5.5.30
         SOURCE_LIST: jessie

@@ -31,6 +31,8 @@ services:
       - "908:908"
       - "909:909"
       - "443:443"
+      - "8081:8081"
+      - "8088:8088"
     volumes:
 #      - ./www/:/var/www/html/:rw
       - /Users/chunguanghao/Documents/ofashion/projects/:/Users/chunguanghao/Documents/ofashion/projects/:rw
@@ -47,6 +49,7 @@ services:
   php:
     build:
       context: .
+      dockerfile: xhprof/7/Dockerfile
       args:
         PHP_VERSION: 7.2
         SOURCE_LIST: stretch

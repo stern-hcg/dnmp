@@ -1,9 +1,9 @@
 version: "3"
 services:
   nginx:
-     build:
-          context: .
-          dockerfile: nginx/Dockerfile
+    build:
+        context: .
+        dockerfile: nginx/Dockerfile
     ports:
       - "80:80"
       - "81:81"

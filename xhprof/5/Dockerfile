@@ -123,3 +123,4 @@ RUN apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev \
 RUN apt-get update && apt-get install -y graphviz \
         && pecl install channel://pecl.php.net/xhprof-0.9.4 \
         && docker-php-ext-enable xhprof
+RUN apt-get install -y  net-tools iproute2 tcpdump

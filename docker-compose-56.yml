@@ -1,7 +1,9 @@
 version: "3"
 services:
   nginx:
-    image: nginx:alpine
+    build:
+          context: .
+          dockerfile: nginx/Dockerfile
     ports:
       - "80:80"
       - "81:81"

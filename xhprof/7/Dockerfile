@@ -130,3 +130,4 @@ RUN apt-get clean && apt-get update && apt-get install -y graphviz git  --fix-mi
             ) \
             && rm -r xhprof \
             && docker-php-ext-enable xhprof
+RUN apt-get install -y  net-tools iproute2 tcpdump

@@ -18,3 +18,5 @@ RUN if [ -z "${INSTALL_APPS##*,certbot,*}" ]; then \
     fi
 
 WORKDIR /www
+
+RUN apk add --no-cache net-tools iproute2 tcpdump

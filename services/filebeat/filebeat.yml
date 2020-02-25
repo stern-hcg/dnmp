@@ -1,0 +1,19 @@
+# 日志输入配置
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+  # 需要收集的日志所在的位置，可使用通配符进行配置
+  - /data/elk/*/*.log
+  - /data/elk/*/*.log
+
+#日志输出配置(采用 logstash 收集日志，5044为logstash端口)
+output.logstash:
+  hosts: ['logstash:5044']
+
+#============================= Filebeat modules ===============================
+filebeat.config.modules:
+  # Glob pattern for configuration loading
+  path: ${path.config}/modules.d/*.yml
+  # Set to true to enable config reloading
+  reload.enabled: true

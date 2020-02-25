@@ -1,6 +1,7 @@
 .idea
 .DS_Store
 .env
+.env.bak
 nohup.out
 docker-compose.yml
 docker-compose.yml.*

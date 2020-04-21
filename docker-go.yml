@@ -1,0 +1,22 @@
+version: "3.4"
+services:
+  go:
+    build:
+      context: ./services/golang
+      args:
+        CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
+        GO_VERSION: golang:1.13
+      labels:
+        golang: "1.13"
+    image: dnmp_golang:1.13
+    container_name: dnmp_golang_1
+    volumes:
+      - ${PROJECT_DIR_XIAOZHU}:${PROJECT_DIR_XIAOZHU}:rw,delegated
+    cap_add:
+      - SYS_PTRACE
+    tty: true
+    networks:
+      - default
+
+networks:
+  default:

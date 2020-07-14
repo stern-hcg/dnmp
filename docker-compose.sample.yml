@@ -280,10 +280,29 @@ services:
 #      - elasticsearch
 #    environment:
 #      TZ: "$TZ"
+#    volumes:
+#      - ${LOGSTASH_CONF_DIR}/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+#      - ${LOGSTASH_CONF_DIR}/logstash.yml:/usr/share/logstash/config/logstash.yml
 #    ports:
 #      - "${LOGSTASH_HOST_PORT_C}:9600"
 #      - "${LOGSTASH_HOST_PORT_S}:5044"
-
+#
+#  filebeat:
+#    build:
+#      context: ./services/filebeat
+#      args:
+#        FILEBEAT_VERSION: ${FILEBEAT_VERSION}
+#        FILEBEAT_MODULES: ${FILEBEAT_MODULES}
+#    container_name: filebeat
+#    hostname: filebeat
+#    restart: always
+#    depends_on:
+#      - logstash
+#    environment:
+#      TZ: "$TZ"
+#    volumes:
+#      - ${FILEBEAT_CONF_DIR}/filebeat.yml:/usr/share/filebeat/filebeat.yml
+#      - ${NGINX_LOG_DIR}:/data/elk/nginx
 
 networks:
   default:

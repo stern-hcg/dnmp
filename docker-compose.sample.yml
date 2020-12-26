@@ -7,12 +7,16 @@ services:
         NGINX_VERSION: nginx:${NGINX_VERSION}
         CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
         NGINX_INSTALL_APPS: ${NGINX_INSTALL_APPS}
-    container_name: nginx
+    #指定此 container_name 可以方便后期使用固定的 bash 命令别名进入容器
+    container_name: ${DNMP_PROJECT}_nginx
     ports:
       - "${NGINX_HTTP_HOST_PORT}:80"
       - "${NGINX_HTTPS_HOST_PORT}:443"
+      - "${DEMO_PROJECT_PORT}:${DEMO_PROJECT_PORT}"
     volumes:
       - ${SOURCE_DIR}:/www/:rw
+      # use delegated to improve file sync performance
+      - ${PROJECT_DIR}:${PROJECT_DIR}:rw,delegated
       - ${NGINX_SSL_CERTIFICATE_DIR}:/ssl:rw
       - ${NGINX_CONFD_DIR}:/etc/nginx/conf.d/:rw
       - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf:ro
@@ -33,16 +37,18 @@ services:
         CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
         PHP_EXTENSIONS: ${PHP_EXTENSIONS}
         TZ: "$TZ"
-    container_name: php
+    container_name: ${DNMP_PROJECT}_php
     expose:
       - 9501
     extra_hosts:
       - "www.site1.com:172.17.0.1"
     volumes:
       - ${SOURCE_DIR}:/www/:rw
+      # php container also need to use this volume mapping, otherwise nginx 404
+      - ${PROJECT_DIR}:${PROJECT_DIR}:rw,delegated
       - ${PHP_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
       - ${PHP_FPM_CONF_FILE}:/usr/local/etc/php-fpm.d/www.conf:rw
-      - ${PHP_LOG_DIR}:/var/log/php
+      - ${PHP_LOG_DIR}:/var/log/php:rw
       - ${DATA_DIR}/composer:/tmp/composer
     restart: always
     cap_add:
@@ -58,7 +64,7 @@ services:
 #        CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
 #        PHP_EXTENSIONS: ${PHP56_EXTENSIONS}
 #        TZ: "$TZ"
-#    container_name: php56
+#    container_name: ${DNMP_PROJECT}_php56
 #    expose:
 #      - 9501
 #    volumes:
@@ -81,7 +87,7 @@ services:
 #        CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
 #        PHP_EXTENSIONS: ${PHP54_EXTENSIONS}
 #        TZ: "$TZ"
-#    container_name: php54
+#    container_name: ${DNMP_PROJECT}_php54
 #    volumes:
 #      - ${SOURCE_DIR}:/www/:rw
 #      - ${PHP54_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
@@ -96,7 +102,7 @@ services:
 
   mysql:
     image: mysql:${MYSQL_VERSION}
-    container_name: mysql
+    container_name: ${DNMP_PROJECT}_mysql
     ports:
       - "${MYSQL_HOST_PORT}:3306"
     volumes:
@@ -111,7 +117,7 @@ services:
 
 #  mysql5:
 #    image: mysql:${MYSQL5_VERSION}
-#    container_name: mysql5
+#    container_name: ${DNMP_PROJECT}_mysql5
 #    ports:
 #      - "${MYSQL5_HOST_PORT}:3306"
 #    volumes:
@@ -126,7 +132,7 @@ services:
 
 #  openresty:
 #    image:  openresty/openresty:${OPENRESTY_VERSION}
-#    container_name: openresty
+#    container_name: ${DNMP_PROJECT}_openresty
 #    ports:
 #       - "${OPENRESTY_HTTP_HOST_PORT}:80"
 #       - "${OPENRESTY_HTTPS_HOST_PORT}:443"
@@ -145,7 +151,7 @@ services:
 
 #  redis:
 #    image: redis:${REDIS_VERSION}
-#    container_name: redis
+#    container_name: ${DNMP_PROJECT}_redis
 #    ports:
 #      - "${REDIS_HOST_PORT}:6379"
 #    volumes:
@@ -160,7 +166,7 @@ services:
 
 #  memcached:
 #    image: memcached:${MEMCACHED_VERSION}
-#    container_name: memcached
+#    container_name: ${DNMP_PROJECT}_memcached
 #    ports:
 #      - "${MEMCACHED_HOST_PORT}:11211"
 #    environment:
@@ -170,7 +176,7 @@ services:
 
 #  rabbitmq:
 #    image: rabbitmq:${RABBITMQ_VERSION}
-#    container_name: rabbitmq
+#    container_name: ${DNMP_PROJECT}_rabbitmq
 #    restart: always
 #    ports:
 #      - "${RABBITMQ_HOST_PORT_C}:5672"
@@ -184,7 +190,7 @@ services:
 
 #  phpmyadmin:
 #    image: phpmyadmin/phpmyadmin:latest
-#    container_name: phpmyadmin
+#    container_name: ${DNMP_PROJECT}_phpmyadmin
 #    ports:
 #      - "${PHPMYADMIN_HOST_PORT}:80"
 #    volumes:
@@ -199,7 +205,7 @@ services:
 
 #  phpredisadmin:
 #    image: erikdubbelboer/phpredisadmin:latest
-#    container_name: phpredisadmin
+#    container_name: ${DNMP_PROJECT}_phpredisadmin
 #    ports:
 #      - "${REDISMYADMIN_HOST_PORT}:80"
 #    networks:
@@ -211,7 +217,7 @@ services:
 
 #  mongodb:
 #    image: mongo:${MONGODB_VERSION}
-#    container_name: mongodb
+#    container_name: ${DNMP_PROJECT}_mongodb
 #    environment:
 #        MONGO_INITDB_ROOT_USERNAME: "${MONGODB_INITDB_ROOT_USERNAME}"
 #        MONGO_INITDB_ROOT_PASSWORD: "${MONGODB_INITDB_ROOT_PASSWORD}"
@@ -228,7 +234,7 @@ services:
 
 #  adminmongo:
 #    image: mrvautin/adminmongo
-#    container_name: adminmongo
+#    container_name: ${DNMP_PROJECT}_adminmongo
 #    ports:
 #      - "${ADMINMONGO_HOST_PORT}:1234"
 #    environment:
@@ -244,7 +250,7 @@ services:
 #      args:
 #        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
 #        ELASTICSEARCH_PLUGINS: ${ELASTICSEARCH_PLUGINS}
-#    container_name: elasticsearch
+#    container_name: ${DNMP_PROJECT}_elasticsearch
 #    environment:
 #      - TZ=$TZ
 #      - discovery.type=single-node
@@ -260,7 +266,7 @@ services:
 
 #  kibana:
 #    image: kibana:${KIBANA_VERSION}
-#    container_name: kibana
+#    container_name: ${DNMP_PROJECT}_kibana
 #    environment:
 #      TZ: "$TZ"
 #      elasticsearch.hosts: http://elasticsearch:9200
@@ -274,7 +280,7 @@ services:
 
 #  logstash:
 #    image: logstash:${LOGSTASH_VERSION}
-#    container_name: logstash
+#    container_name: ${DNMP_PROJECT}_logstash
 #    hostname: logstash
 #    restart: always
 #    depends_on:
@@ -306,7 +312,7 @@ services:
 #        ALPINE_VERSION: alpine:${ALPINE_VERSION}
 #        TZ: "$TZ"
 #        CONTAINER_PACKAGE_URL: ${CONTAINER_PACKAGE_URL}
-#    container_name: supervisor
+#    container_name: ${DNMP_PROJECT}_supervisor
 #    ports:
 #      - "${SUPERVISOR_HOST_PORT_C}:9001"
 #    volumes:

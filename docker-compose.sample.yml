@@ -30,6 +30,10 @@ services:
       - default
 
   php:
+    # user: "${UID}:${GID}" # we added this line to get a specific user / group id
+    # uid in container share uid pool within host kernel
+    # use specified uid to avoid security/permission vulnerability which leads corruption of host system
+    user: "1000:1000"
     build:
       context: ./services/php
       args:

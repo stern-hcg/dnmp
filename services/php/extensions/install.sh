@@ -613,7 +613,7 @@ fi
 if [[ -z "${EXTENSIONS##*,zip,*}" ]]; then
     echo "---------- Install zip ----------"
     # Fix: https://github.com/docker-library/php/issues/797
-    apk add --no-cache libzip-dev zlib-dev
+    apk add --no-cache libzip-dev
 
     isPhpVersionGreaterOrEqual 7 4
     if [[ "$?" != "1" ]]; then

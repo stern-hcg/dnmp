@@ -11,4 +11,4 @@ alias dmysql="docker exec -it ${DNMP_PROJECT}_mysql /bin/bash"
 alias dredis="docker exec -it ${DNMP_PROJECT}_redis /bin/sh"
 
 alias startdnmp="docker-compose --env-file ${DNMP_DIR}/.env -p ${DNMP_PROJECT} -f ${DNMP_DIR}/docker-compose.yml up -d"
-alias stopdnmp="docker-compose --env-file ${DNMP_DIR}/.env -p -p ${DNMP_PROJECT} -f ${DNMP_DIR}/docker-compose.yml down"
+alias stopdnmp="docker-compose --env-file ${DNMP_DIR}/.env -p ${DNMP_PROJECT} -f ${DNMP_DIR}/docker-compose.yml down"

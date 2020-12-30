@@ -33,6 +33,7 @@ services:
     # user: "${UID}:${GID}" # we added this line to get a specific user / group id
     # uid in container share uid pool within host kernel
     # use specified uid to avoid security/permission vulnerability which leads corruption of host system
+    # uncomment this to allow exec high privilege commands in container, such as apk add ..
     user: "1000:1000"
     build:
       context: ./services/php

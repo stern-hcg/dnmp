@@ -37,5 +37,7 @@ ENV COMPOSER_HOME=/tmp/composer
 # php image's www-data user uid & gid are 82, change them to 1000 (primary user)
 # 容器内使用的uid，拿到的权限跟容器外使用的同样uid 的权限是一样的。避免权限问题
 #RUN apk --no-cache add shadow && usermod -u 1000 www-data && groupmod -g 1000 www-data
+#RUN deluser www-data && adduser -DH -h /home/www-data -s /sbin/nologin -u 1000 www-data
+RUN apk add git graphviz
 
 WORKDIR /www

@@ -7,3 +7,4 @@ docker-compose.yml.*
 www/*
 !www/localhost/
 logs/*
+!www/xhprof/

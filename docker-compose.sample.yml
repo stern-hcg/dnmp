@@ -54,7 +54,21 @@ services:
       - ${PHP_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
       - ${PHP_FPM_CONF_FILE}:/usr/local/etc/php-fpm.d/www.conf:rw
       - ${PHP_LOG_DIR}:/var/log/php:rw
+      - ${PHP_XHPROF_DIR}:/var/log/xhprof
+      - ${PHP_XDEBUG_DIR}:/var/log/xdebug
       - ${DATA_DIR}/composer:/tmp/composer
+    restart: always
+    cap_add:
+      - SYS_PTRACE
+    networks:
+      - default
+  webgrind:
+    container_name: webgrind
+    image: jokkedk/webgrind:latest
+    ports:
+          - "${WEBGRIND}:80"
+    volumes:
+      - ${PHP_XDEBUG_DIR}:/tmp
     restart: always
     cap_add:
       - SYS_PTRACE

@@ -3,3 +3,4 @@
 !certs/localhost/
 !localhost.conf
 !demo.conf
+!xhprof.conf

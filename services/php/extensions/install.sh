@@ -340,7 +340,18 @@ if [[ -z "${EXTENSIONS##*,imagick,*}" ]]; then
     echo "---------- Install imagick ----------"
 	apk add --no-cache file-dev
 	apk add --no-cache imagemagick-dev
-    printf "\n" | pecl install imagick-3.4.4
+	# --virtual, 编译后会清除相关安装依赖
+	apk add --no-cache --virtual .imagick-runtime-deps imagemagick
+	apk add --no-cache --virtual .phpize-deps $PHPIZE_DEPS libtool
+	export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS"
+#    printf "\n" | pecl install imagick-3.4.4
+    isPhpVersionGreaterOrEqual 7 0
+    if [[ "$?" = "1" ]]; then
+        pecl install imagick-3.4.4
+    else
+        pecl install imagick-3.4.3
+    fi
+
     docker-php-ext-enable imagick
 fi
 
@@ -613,13 +624,24 @@ fi
 if [[ -z "${EXTENSIONS##*,zip,*}" ]]; then
     echo "---------- Install zip ----------"
     # Fix: https://github.com/docker-library/php/issues/797
-    apk add --no-cache libzip-dev
+    apk add --no-cache libzip-dev zip
+    # libzip-dev 这个装不上
 
     isPhpVersionGreaterOrEqual 7 4
-    if [[ "$?" != "1" ]]; then
-        docker-php-ext-configure zip --with-libzip=/usr/include
+    if [[ "$?" = "1" ]]; then
+        #php7.4编译参数--enable-zip变成了--with-zip,也就是说，zip扩展需要动态加载，不再是直接编译到php的可执行程序中
+        options=""
+    else
+        # php 5.6 -> 7.3 版本，可以通过这种形式安装
+# libzipp 基于 libzip 之上封装的，而 libzip 又是基于 zlib库封装的
+# 上面装 libzip-dev 就会装好 zlib-dev ，不用单独装 zlib-dev zlib1g-dev
+# apk add --no-cache zlib-dev zlib1g-dev
+# options="--with-zlib-dir=/usr/include"
+# 根据需要装的扩展到底是啥，zip扩展需要的是 --with-libzip 的配置，但是其他的扩展，例如 pdo-mysql 这个需要 --with-zlib-dir 的配置。在安装 zip 扩展的时候，不能使用配置 --with-zlib-dir
+        options="--with-libzip=/usr/include" # 装好了zip，也就装好了zlib。
     fi
 
+    docker-php-ext-configure zip ${options}
 	docker-php-ext-install ${MC} zip
 fi
 
@@ -629,13 +651,13 @@ if [[ -z "${EXTENSIONS##*,xhprof,*}" ]]; then
     isPhpVersionGreaterOrEqual 7 0
 
     if [[ "$?" = "1" ]]; then
-        mkdir xhprof \
-        && tar -xf xhprof-2.2.0.tgz -C xhprof --strip-components=1 \
-        && ( cd xhprof/extension/ && phpize && ./configure  && make ${MC} && make install ) \
-        && docker-php-ext-enable xhprof
+        xhprof_version="xhprof"
     else
-       echo "---------- PHP Version>= 7.0----------"
+       echo "---------- PHP Version>= 7.0, installing deprecated xhprof version----------"
+       # 低版本 php 直接安装指定版本的 xhprof
+        xhprof_version="xhprof-0.9.4"
     fi
+    pecl install ${xhprof_version} && docker-php-ext-enable xhprof
 
 fi
 
@@ -709,6 +731,21 @@ if [[ -z "${EXTENSIONS##*,sdebug,*}" ]]; then
              && docker-php-ext-enable xdebug
     else
         echo "---------- PHP Version>= 7.2----------"
+    fi
+fi
+
+if [[ -z "${EXTENSIONS##*,grpc,*}" ]]; then
+    echo "---------- Install grpc ----------"
+    isPhpVersionGreaterOrEqual 7 0
+
+    if [[ "$?" = "1" ]]; then
+        pecl channel-update pecl.php.net
+        printf "\n" | pecl install grpc-1.30.0
+        pecl install protobuf-3.12.2
+        docker-php-ext-enable grpc
+        docker-php-ext-enable protobuf
+    else
+        echo "---------- PHP Version>= 7.0----------"
     fi
 fi
 
